@@ -1,0 +1,3 @@
+# Floppy inserted at boot time
+floppya: 1_44=bootloader.bin, status=inserted
+boot: a
