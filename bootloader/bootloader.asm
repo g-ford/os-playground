@@ -1,21 +1,10 @@
 ; A simple boot sector that prints "Hello!" to the screen.
 
+[org 0x7C00] ; The BIOS loads the boot sector into memory at 0x7C00.
+
 mov ah, 0x0E ; BIOS teletype function
 
-; addressing example
-mov al, the_secret
-int 0x10
-
-mov al, [the_secret]    ; in real mode, this is from the start of memory, not the start
-                        ; of this the program (which is 0x7C00 the start of the boot sector)
-int 0x10
-
-mov bx, the_secret  ; first load 'offset' of the_secret into bx
-add bx, 0x7C00      ; add the boot sector's start address to bx
-mov al, [bx]        ; load the byte at the address in bx into al
-int 0x10
-
-mov al, [0x7C1B] ; known after building and checking which offset the_secret is at
+mov al, [the_secret]
 int 0x10
 
 the_secret:
