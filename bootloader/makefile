@@ -1,9 +1,11 @@
 # Programs to use
 NASM = nasm
-QEMU = qemu-system-i386
-
-# NASM flags
 NASM_FLAGS = -f bin
+
+
+QEMU = qemu-system-i386
+# QEMU_FLAGS = -hda
+
 
 # Source file
 SOURCE = bootloader.asm
@@ -17,7 +19,7 @@ build: $(SOURCE)
 	$(NASM) $(NASM_FLAGS) -o $(OUTPUT) $(SOURCE)
 
 run: build
-	$(QEMU) $(OUTPUT)
+	$(QEMU) -drive file=$(OUTPUT),format=raw,index=0,media=disk
 
 clean:
 	rm -f $(OUTPUT)
