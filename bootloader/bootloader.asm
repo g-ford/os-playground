@@ -2,17 +2,24 @@
 
 mov ah, 0x0E ; BIOS teletype function
 
-; After each letter we need to interrupt the BIOS to print the letter to the screen.
-mov al, 'H'
+; addressing example
+mov al, the_secret
 int 0x10
-mov al, 'e'
+
+mov al, [the_secret]    ; in real mode, this is from the start of memory, not the start
+                        ; of this the program (which is 0x7C00 the start of the boot sector)
 int 0x10
-mov al, 'l'
+
+mov bx, the_secret  ; first load 'offset' of the_secret into bx
+add bx, 0x7C00      ; add the boot sector's start address to bx
+mov al, [bx]        ; load the byte at the address in bx into al
 int 0x10
-mov al, 'l'
+
+mov al, [0x7C1B] ; known after building and checking which offset the_secret is at
 int 0x10
-mov al, 'o'
-int 0x10
+
+the_secret:
+    db 'S'
 
 loop:
     jmp loop
