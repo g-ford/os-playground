@@ -1,4 +1,18 @@
-; A simple looping boot sector program
+; A simple boot sector that prints "Hello!" to the screen.
+
+mov ah, 0x0E ; BIOS teletype function
+
+; After each letter we need to interrupt the BIOS to print the letter to the screen.
+mov al, 'H'
+int 0x10
+mov al, 'e'
+int 0x10
+mov al, 'l'
+int 0x10
+mov al, 'l'
+int 0x10
+mov al, 'o'
+int 0x10
 
 loop:
     jmp loop

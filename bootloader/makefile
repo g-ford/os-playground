@@ -1,6 +1,6 @@
 # Programs to use
 NASM = nasm
-BOCHS = bochs
+QEMU = qemu-system-i386
 
 # NASM flags
 NASM_FLAGS = -f bin
@@ -17,7 +17,7 @@ build: $(SOURCE)
 	$(NASM) $(NASM_FLAGS) -o $(OUTPUT) $(SOURCE)
 
 run: build
-	$(BOCHS) -f .bochsrc
+	$(QEMU) $(OUTPUT)
 
 clean:
 	rm -f $(OUTPUT)

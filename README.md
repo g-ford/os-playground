@@ -1,9 +1,8 @@
 # Prerequsites
 
-Nasm for ASM compiling (and linking?)
-Bochs for CPU emulation
+Nasm for ASM compiling
 Qemu for for Virtual Machine
 
 ```
-brew install bochs qemu nasm
+brew install qemu nasm
 ```
