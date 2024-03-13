@@ -19,7 +19,7 @@ build: $(SOURCE)
 	$(NASM) $(NASM_FLAGS) -o $(OUTPUT) $(SOURCE)
 
 run: build
-	$(QEMU) -drive file=$(OUTPUT),format=raw,index=0,media=disk
+	$(QEMU) $(QEMU_FLAGS) $(OUTPUT)
 
 clean:
 	rm -f $(OUTPUT)

@@ -1,50 +1,50 @@
-; A simple boot sector that prints "Hello!" to the screen.
-; [org 0x7C00] ; The BIOS loads the boot sector into memory at 0x7C00.
+; A simple boot sector
+[org 0x7C00] ; The BIOS loads the boot sector into memory at 0x7C00.
 
-mov ah, 0x0e ;
+mov [BOOT_DRIVE], dl ; Save the boot drive number
 
-; this wont print the secret as it is in the wrong segment
-mov al, [the_secret]
-int 0x10
+mov bx, LOADING
+call print_msg_nl
 
-; set the data segement to 0x7c0 (where we know the code is)
-; move will by default use the ds register offset
-mov bx, 0X7c0;
-mov ds, bx;
-mov al, [the_secret]
-int 0x10
 
-; here we are explicitly using the extra segment register, with the the_secret offset
-; but we have not set the es register to 0x7c0 so it will load from 0
-mov al, [es:the_secret]
-int 0x10
+; set up the stack
+mov bp, 0x8000
+mov sp, bp
 
-; here we set the es register to 0x7c0 and then load the secret
-mov es, bx
-mov al, [es:the_secret]
-int 0x10
+; load the second sector of the boot drive into memory at 0x9000
+; we haven't set up ES so all data will be loaded at raw addresses
+mov bx, 0x9000
+mov dh, 0x02 ; number of sectors to read (2 x 512 bytes)
+mov dl, [BOOT_DRIVE]
+call disk_load
 
-; the rest of this will work as the data segment is set to 0x7c0
+; print the first byte of the first loaded sector
+mov dx, [0x9000]
+call print_hex      ; should be 0x1234
+call print_nl
 
-mov bx, loading     ; this is the address, not the message itself
-call print_msg
+; print the first byte of the second loaded sector
+mov dx, [0x9000 + 512]
+call print_hex      ; should be 0x5678
+call print_nl
 
-mov dx , 0x1fb6 ; store the value to print in dx
-call print_hex ; call the function
+jmp $ ; Infinite loop
 
-loop:
-    jmp loop
-
-the_secret:
-    db "X"
-
-loading:
-    db 'Booting OS...', 0 ; null terminated string
+LOADING db 'Booting OS...', 0 ; null terminated string
+BOOT_DRIVE db 0
 
 %include "utils.asm"
+%include "disk.asm"
 
 times 510-($-$$) db 0 ; Pad the rest of the sector with 0s. This is to make the file 512 bytes long.
                       ; The file must be 512 bytes long to be a valid boot sector.
                       ; Minus the last two bytes, which are the magic number, 0xAA55.
 
 dw 0xAA55 ; The magic number that makes this a boot sector.
+
+; the BIOS will only load the above assembly code into memory at 0x7C00 and execute it
+; so we will pad out the next two sectors with known hex to test the disk_load function
+; boot sector = sector 1 of cyl 0 of head 0 of hdd 0
+; from now on = sector 2 ...
+times 256 dw 0x1234 ; sector 2 = 512 bytes
+times 256 dw 0x5678 ; sector 3 = 512 bytes

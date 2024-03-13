@@ -2,6 +2,7 @@
 
 ; Takes an address in bx and prints the string at that address
 ; The string must be null terminated
+print:
 print_msg:
     pusha
 print_msg_inner:
@@ -13,6 +14,21 @@ print_msg_inner:
     jmp print_msg_inner ; start the loop again
 print_msg_return:
     popa
+    ret
+
+print_msg_nl:
+    pusha
+    call print_msg
+    call print_nl
+    popa
+    ret
+
+print_newline:
+print_nl:
+    mov al, 0x0A
+    call print_char
+    mov al, 0x0D
+    call print_char
     ret
 
 print_char:
@@ -57,5 +73,9 @@ hex_ready_to_print:
     popa
     ret
 
-HEX_OUT :
-    db "0x0000" ,0
+HEX_OUT db "0x0000" ,0
+
+A_REG: db "A: ", 0
+B_REG: db "B: ", 0
+C_REG: db "C: ", 0
+D_REG: db "D: ", 0
