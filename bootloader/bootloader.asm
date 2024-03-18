@@ -1,50 +1,35 @@
 ; A simple boot sector
 [org 0x7C00] ; The BIOS loads the boot sector into memory at 0x7C00.
 
-mov [BOOT_DRIVE], dl ; Save the boot drive number
+mov bp, 0x9000        ; Set the stack pointer to 0x9000.
+mov sp, bp            ; Set the stack pointer to 0x9000.
 
-mov bx, LOADING
-call print_msg_nl
+MSG db "Preparing to switch to protected mode...", 0
+mov bx, MSG
+call print_msg
 
+call switch_to_pm
+jmp $
 
-; set up the stack
-mov bp, 0x8000
-mov sp, bp
+switch_to_pm:
+    cli                         ; Clear all interrupts.
+    lgdt [gdt_descriptor]       ; Load the global descriptor table.
 
-; load the second sector of the boot drive into memory at 0x9000
-; we haven't set up ES so all data will be loaded at raw addresses
-mov bx, 0x9000
-mov dh, 0x02 ; number of sectors to read (2 x 512 bytes)
-mov dl, [BOOT_DRIVE]
-call disk_load
+    mov eax, cr0                ; Get the value of the control register 0.
+    or eax, 0x1                 ; Set the first bit of the control register 0 to 1.
+    mov cr0, eax                ; Write the new value of the control register 0.
+    ; This is to enable protected mode. The CPU is now in 32-bit mode.
 
-; print the first byte of the first loaded sector
-mov dx, [0x9000]
-call print_hex      ; should be 0x1234
-call print_nl
+    ; use a far jump to clear the prefetch queue/pipeline
+    jmp CODE_SEG:boot_main      ; Jump to the main part of the boot loader.
 
-; print the first byte of the second loaded sector
-mov dx, [0x9000 + 512]
-call print_hex      ; should be 0x5678
-call print_nl
-
-jmp $ ; Infinite loop
-
-LOADING db 'Booting OS...', 0 ; null terminated string
-BOOT_DRIVE db 0
 
 %include "utils.asm"
-%include "disk.asm"
+%include "gdt.asm" ; Include the file with the GDT.
+%include "protected.asm" ; Include the file with the protected mode code.
 
 times 510-($-$$) db 0 ; Pad the rest of the sector with 0s. This is to make the file 512 bytes long.
                       ; The file must be 512 bytes long to be a valid boot sector.
                       ; Minus the last two bytes, which are the magic number, 0xAA55.
 
 dw 0xAA55 ; The magic number that makes this a boot sector.
-
-; the BIOS will only load the above assembly code into memory at 0x7C00 and execute it
-; so we will pad out the next two sectors with known hex to test the disk_load function
-; boot sector = sector 1 of cyl 0 of head 0 of hdd 0
-; from now on = sector 2 ...
-times 256 dw 0x1234 ; sector 2 = 512 bytes
-times 256 dw 0x5678 ; sector 3 = 512 bytes

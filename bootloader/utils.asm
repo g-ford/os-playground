@@ -1,5 +1,4 @@
-
-
+[bits 16]
 ; Takes an address in bx and prints the string at that address
 ; The string must be null terminated
 print:
