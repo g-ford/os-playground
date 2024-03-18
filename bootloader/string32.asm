@@ -1,15 +1,14 @@
 [bits 32]
 
 ; equ acts like a #define or a constant
-VIDEO_MEMORY equ 0xb8000
-WHITE_ON_BLACK equ 0x0F
+VIDEO_MEMORY: equ 0xb8000
+WHITE_ON_BLACK: equ 0x0F
 
 ; print a string
 ; this will always start in the top left of screen
 ; and assume that the string is null terminated
 print32:
     pusha
-
     mov edx, VIDEO_MEMORY
 
 print32_inner:
@@ -27,4 +26,4 @@ print32_inner:
 
 print32_end:
     popa
-    return
+    ret

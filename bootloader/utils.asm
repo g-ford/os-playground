@@ -1,4 +1,8 @@
 [bits 16]
+
+CR equ 0x0D
+LF equ 0x0A
+
 ; Takes an address in bx and prints the string at that address
 ; The string must be null terminated
 print:
@@ -24,9 +28,9 @@ print_msg_nl:
 
 print_newline:
 print_nl:
-    mov al, 0x0A
+    mov al, CR
     call print_char
-    mov al, 0x0D
+    mov al, LF
     call print_char
     ret
 
