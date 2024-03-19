@@ -9,6 +9,7 @@ boot_main:
     mov gs, ax      ; set the gs segment to the new value
 
     mov ebp, 0x90000    ; reset the stack pointer to 0x90000 (why this magic number?)
+                        ; I think because it is higher than the VGA memory
     mov esp, ebp        ; set the stack pointer to base pointer
 
     call begin
