@@ -1,4 +1,5 @@
-bootloader.bin
-
 *.o
 *.bin
+
+os-image
+dockcross

@@ -13,7 +13,7 @@ SOURCE = bootloader.asm
 # Output file
 OUTPUT = bootloader.bin
 
-all: build
+all: clean run
 
 build: $(SOURCE)
 	$(NASM) $(NASM_FLAGS) -o $(OUTPUT) $(SOURCE)

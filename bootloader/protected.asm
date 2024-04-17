@@ -1,5 +1,4 @@
 [bits 32]
-
 boot_main:
     ; the old data segment is not correct so we need to reset it
     mov ax, DATA_SEG
@@ -14,13 +13,14 @@ boot_main:
 
     call begin
 
-
+[bits 32]
 begin:
     ; messy as it writes on top of Real Mode messages
     ; but not sure how to clear the screen in 32-bit mode (yet)
     mov ebx, MSG_PROT_MODE
     call print32
 
+    call KERNEL_OFFSET
     jmp $
 
 

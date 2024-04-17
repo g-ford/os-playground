@@ -4,22 +4,25 @@ TARGET=linux-i686
 DOCKER=docker
 dc=dockcross
 
+FILES=$(wildcard *.c)
+OUTNAME=kernal
 docker: clean
+	open -a Docker
 	$(DOCKER) run --rm $(dc)/$(TARGET) > ./$(dc)
 	chmod +x ./$(dc)
 
 
-build: test.c docker
-	./$(dc) $(CC) $(CCFLAGS) -c test.c -o test.o
+build: $(FILES) docker
+	./$(dc) $(CC) $(CCFLAGS) -c $(FILES) -o $(OUTNAME).o
 
 link: build
-	./$(dc) bash -c "ld -m elf_i386 -o test.bin -Ttext 0x0 --oformat binary test.o"
+	./$(dc) bash -c "ld -m elf_i386 -o $(OUTNAME).bin -Ttext 0x1000 --oformat binary $(OUTNAME).o"
 
 dis: link
-	ndisasm -b 32 test.bin > test.asm
+	ndisasm -b 32 $(OUTNAME).bin > $(OUTNAME).asm
 
 clean:
-	rm -f test.o a.out test.bin test.asm
+	rm -f *.out *.o *.bin *.asm
 
 full_clean: clean
 	rm -f $(dc)
